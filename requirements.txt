@@ -1,0 +1,11 @@
+tensorflow
+matplotlib
+keras-cv
+jupyterlab
+ipykernel
+pandas
+numpy
+# scikit-learn
+# scikit-image
+# seaborn
+# statsmodels
