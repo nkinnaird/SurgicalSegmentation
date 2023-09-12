@@ -24,15 +24,15 @@ class SegmentationDataset():
 
     def get_dataset(self):
         seg_dataset = tf.data.Dataset.from_tensor_slices((self.image_paths, self.mask_paths))
-        # if self.shuffle:
+        # if self.shuffle: # Might not need this with keras model.fit
         #     seg_dataset = seg_dataset.shuffle(buffer_size=seg_dataset.cardinality())
         seg_dataset = seg_dataset.map(self.prepare_images) # num_parallel_calls
         if self.augment:
             seg_dataset = seg_dataset.map(self.augment_images) # num_parallel_calls
 
         seg_dataset = seg_dataset.batch(self.batch_size)
-        # seg_dataset = seg_dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
-        # seg_dataset = seg_dataset.repeat()
+        seg_dataset = seg_dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
+        # seg_dataset = seg_dataset.repeat() # Might not need this with keras model.fit
 
         # augment, shuffle, batch, prefetch, repeat
         # buffer size, drop_remainder
