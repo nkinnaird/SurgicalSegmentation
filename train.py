@@ -37,7 +37,7 @@ def main():
         metrics=["accuracy"], # There is definitely a better metric to use here
     )
 
-    model_name = "test_segmenation_model"
+    model_name = "test_segmentation_model"
 
     callbacks = [tf.keras.callbacks.TensorBoard(log_dir=f'logs/{model_name}')]
 
