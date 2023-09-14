@@ -7,12 +7,15 @@ import tf_data_utils
 import model_utils
 # import os
 # import numpy as np
+import time
 
 def main():
 
     # Parameters would be better passed in via argparse
     num_epochs = 20
     batch_size = 8 # Didn't change much when I upped it, definitely places to optimize the training pipeline to be found
+
+    print(f'\nTraining for {num_epochs} epochs with batch size {batch_size}.\n')
 
     # images_dir = '/Users/NickPC/Documents/DataScience/Datasets/miccai2022_sisvse_dataset/images/real/'
     # train_masks_dir = '/Users/NickPC/Documents/DataScience/Datasets/miccai2022_sisvse_dataset/semantic_masks/real_train_1/'
@@ -38,8 +41,12 @@ def main():
     )
 
     model_name = "test_segmentation_model"
+    # model_name = "test_shuffle"
 
     callbacks = [tf.keras.callbacks.TensorBoard(log_dir=f'logs/{model_name}')]
+    # callbacks = []
+
+    start = time.time()
 
     segmentation_model.fit(
         train_dataset,
@@ -47,6 +54,10 @@ def main():
         epochs=num_epochs,
         callbacks=callbacks
     )
+
+    end = time.time()
+
+    print(f'\n{(end-start)/60.:.3f} minutes to fit.')
 
     # segmentation_model.fit(
     #     temp_train_ds,

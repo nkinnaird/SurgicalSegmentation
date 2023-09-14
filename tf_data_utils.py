@@ -24,18 +24,16 @@ class SegmentationDataset():
 
     def get_dataset(self):
         seg_dataset = tf.data.Dataset.from_tensor_slices((self.image_paths, self.mask_paths))
-        # if self.shuffle: # Might not need this with keras model.fit
-        #     seg_dataset = seg_dataset.shuffle(buffer_size=seg_dataset.cardinality())
-        seg_dataset = seg_dataset.map(self.prepare_images) # num_parallel_calls
+        seg_dataset = seg_dataset.map(self.prepare_images, num_parallel_calls=tf.data.AUTOTUNE)
+        seg_dataset = seg_dataset.cache() # perform time intensive mapping before and memory intensive mapping after
+        if self.shuffle:
+            seg_dataset = seg_dataset.shuffle(buffer_size=seg_dataset.cardinality(), reshuffle_each_iteration=True) # If caching this should be after the cache call, otherwise it's nice to place it before opening the images as the entire dataset of string paths can be shuffled without memory issues
+        seg_dataset = seg_dataset.batch(self.batch_size) # try batching before augmenting to vectorize the augmentation - doesn't actually seem to help all that much
         if self.augment:
-            seg_dataset = seg_dataset.map(self.augment_images) # num_parallel_calls
-
-        seg_dataset = seg_dataset.batch(self.batch_size)
+            seg_dataset = seg_dataset.map(self.augment_images, num_parallel_calls=tf.data.AUTOTUNE)
+        # seg_dataset = seg_dataset.batch(self.batch_size) # drop_remainder
+        # seg_dataset = seg_dataset.repeat() # Doesn't seem to be needed - I think maybe newer tf/keras code with model.fit handles this automatically
         seg_dataset = seg_dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
-        # seg_dataset = seg_dataset.repeat() # Might not need this with keras model.fit
-
-        # augment, shuffle, batch, prefetch, repeat
-        # buffer size, drop_remainder
 
         return seg_dataset
         
